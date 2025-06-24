@@ -107,6 +107,39 @@ const paginate = async (Model, filter = {}, options = {}) => {
   }
 };
 
+// ✅ Optional Add-ons
+
+const findOrCreate = async (Model, filter, defaults = {}) => {
+  try {
+    let doc = await Model.findOne(filter).lean();
+    if (!doc) {
+      doc = await new Model({ ...filter, ...defaults }).save();
+    }
+    return doc;
+  } catch (err) {
+    console.error("DB FindOrCreate Error:", err.message);
+    throw err;
+  }
+};
+
+const softDeleteById = async (Model, id, deletedField = "isDeleted") => {
+  try {
+    return await Model.findByIdAndUpdate(id, { $set: { [deletedField]: true } }, { new: true }).lean();
+  } catch (err) {
+    console.error("DB SoftDeleteById Error:", err.message);
+    throw err;
+  }
+};
+
+const aggregate = async (Model, pipeline = []) => {
+  try {
+    return await Model.aggregate(pipeline);
+  } catch (err) {
+    console.error("DB Aggregate Error:", err.message);
+    throw err;
+  }
+};
+
 module.exports = {
   create,
   insertMany,
@@ -119,4 +152,9 @@ module.exports = {
   deleteById,
   countDocuments,
   paginate,
+
+  // Optional exports
+  findOrCreate,
+  softDeleteById,
+  aggregate
 };

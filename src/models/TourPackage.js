@@ -17,10 +17,8 @@ const tourPackageSchema = new mongoose.Schema(
     // },
 
     destination: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Destination',
+      type: String,
       required: true,
-      index: true, // 🔍 filter by destination
     },
 
     description: {
@@ -48,7 +46,7 @@ const tourPackageSchema = new mongoose.Schema(
       },
     ],
 
-    basePrice: {
+    price: {
       adult: { type: Number, required: true },
       child: { type: Number, default: 0 },
       infant: { type: Number, default: 0 },

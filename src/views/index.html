@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Tour Package</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .inline {
+      display: flex;
+      gap: 10px;
+    }
+
+    .inline > div {
+      flex: 1;
+    }
+
+    .dynamic-group {
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Create Tour Package</h2>
+
+  <form action="/api/admin/tourpackage/submit" method="POST" enctype="multipart/form-data">
+    <!-- Basic Info -->
+    <label>Title:</label>
+    <input type="text" name="title" required>
+
+    <label>Destination:</label>
+    <input type="text" name="destination" required>
+
+    <label>Description:</label>
+    <textarea name="description" rows="4" required></textarea>
+
+    <label>Highlights:</label>
+    <div id="highlights" class="dynamic-group">
+      <input type="text" name="highlights[]" placeholder="Highlight 1">
+    </div>
+    <button type="button" onclick="addField('highlights', 'highlights[]')">+ Add Highlight</button>
+
+    <!-- Duration & Capacity -->
+    <label>Duration Days:</label>
+    <input type="number" name="durationDays" required>
+
+    <label>Capacity:</label>
+    <input type="number" name="capacity" value="1">
+
+    <!-- Dates -->
+    <label>Available Dates:</label>
+    <div id="availableDates" class="dynamic-group">
+      <div class="inline">
+        <div><input type="date" name="availableDates[0][from]" placeholder="From date"></div>
+        <div><input type="date" name="availableDates[0][to]" placeholder="To date"></div>
+      </div>
+    </div>
+    <button type="button" onclick="addDateField()">+ Add Date Range</button>
+
+    <!-- Price -->
+    <label>Price (INR):</label>
+    <div class="inline">
+      <div><input type="number" name="price[adult]" placeholder="Adult" required></div>
+      <div><input type="number" name="price[child]" placeholder="Child"></div>
+      <div><input type="number" name="price[infant]" placeholder="Infant"></div>
+    </div>
+
+    <!-- Inclusions -->
+    <label>Includes:</label>
+    <div id="includes" class="dynamic-group">
+      <input type="text" name="includes[]" placeholder="Include 1">
+    </div>
+    <button type="button" onclick="addField('includes', 'includes[]')">+ Add Include</button>
+
+    <!-- Exclusions -->
+    <label>Excludes:</label>
+    <div id="excludes" class="dynamic-group">
+      <input type="text" name="excludes[]" placeholder="Exclude 1">
+    </div>
+    <button type="button" onclick="addField('excludes', 'excludes[]')">+ Add Exclude</button>
+
+    <!-- FAQs -->
+    <label>FAQs:</label>
+    <div id="faqs" class="dynamic-group">
+      <div class="inline">
+        <div><input type="text" name="faqs[0][question]" placeholder="Question"></div>
+        <div><input type="text" name="faqs[0][answer]" placeholder="Answer"></div>
+      </div>
+    </div>
+    <button type="button" onclick="addFaqField()">+ Add FAQ</button>
+
+    <!-- Media -->
+    <label>Title Image:</label>
+    <input type="file" name="titleImage" accept="image/*" required>
+
+    <label>Tour Images (Max 10):</label>
+    <input type="file" name="tourImages" accept="image/*" multiple>
+
+    <label>Video File:</label>
+    <input type="file" name="videoUrl" accept="video/*">
+
+    <!-- Status -->
+    <label>Status:</label>
+    <select name="status">
+      <option value="active" selected>Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+
+    <button type="submit">Submit Tour Package</button>
+  </form>
+
+  <script>
+    function addField(containerId, inputName) {
+      const container = document.getElementById(containerId);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = inputName;
+      container.appendChild(input);
+    }
+
+    function addDateField() {
+      const container = document.getElementById("availableDates");
+      const div = document.createElement("div");
+      div.className = "inline";
+      const from = document.createElement("input");
+      from.type = "date";
+      from.name = `availableDates[${container.children.length}][from]`;
+
+      const to = document.createElement("input");
+      to.type = "date";
+      to.name = `availableDates[${container.children.length}][to]`;
+
+      const wrap = document.createElement("div");
+      wrap.appendChild(from);
+      div.appendChild(wrap);
+
+      const wrap2 = document.createElement("div");
+      wrap2.appendChild(to);
+      div.appendChild(wrap2);
+
+      container.appendChild(div);
+    }
+
+    function addFaqField() {
+      const container = document.getElementById("faqs");
+      const index = container.children.length;
+      const div = document.createElement("div");
+      div.className = "inline";
+
+      const qDiv = document.createElement("div");
+      const q = document.createElement("input");
+      q.name = `faqs[${index}][question]`;
+      q.placeholder = "Question";
+      qDiv.appendChild(q);
+
+      const aDiv = document.createElement("div");
+      const a = document.createElement("input");
+      a.name = `faqs[${index}][answer]`;
+      a.placeholder = "Answer";
+      aDiv.appendChild(a);
+
+      div.appendChild(qDiv);
+      div.appendChild(aDiv);
+
+      container.appendChild(div);
+    }
+  </script>
+
+</body>
+</html>

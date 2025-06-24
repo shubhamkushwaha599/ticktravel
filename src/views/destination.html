@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Destination</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    input[type="file"] {
+      margin-top: 4px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Create Destination</h2>
+
+  <form action="/api/admin/destination/submit" method="POST" enctype="multipart/form-data">
+    <label for="name">Destination Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="country">Country:</label>
+    <input type="text" id="country" name="country" required>
+
+    <label for="city">City:</label>
+    <input type="text" id="city" name="city" required>
+
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" rows="4"></textarea>
+
+    <label>Coordinates:</label>
+    <input type="number" step="any" name="lat" placeholder="Latitude">
+    <input type="number" step="any" name="lng" placeholder="Longitude">
+    <input type="number" step="any" name="alt" placeholder="Altitude (optional)">
+
+    <label for="attractions">Attractions (comma separated):</label>
+    <input type="text" id="attractions" name="attractions" placeholder="e.g. Beach, Temple, Museum">
+
+    <label for="isPopular">Is Popular?</label>
+    <select id="isPopular" name="isPopular">
+      <option value="false">No</option>
+      <option value="true">Yes</option>
+    </select>
+
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+
+    <label for="titleImage">Title Image:</label>
+    <input type="file" id="titleImage" name="titleImage" accept="image/*" required>
+
+    <label for="gallery">Gallery Images:</label>
+    <input type="file" id="gallery" name="gallery" accept="image/*" multiple>
+
+    <button type="submit">Submit Destination</button>
+  </form>
+
+</body>
+</html>
