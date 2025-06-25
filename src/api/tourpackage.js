@@ -17,4 +17,16 @@ router.get("/all", async (req, res) => {
 });
 
 
+// ✅ Get one tour package by ID
+router.get("/get/:id", async (req, res) => {
+  try {
+    const tour = await db.findById(TourPackage, req.params.id);
+    if (!tour) return res.status(404).json({ success: false, message: "Tour not found" });
+    res.json({ success: true, data: tour });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+
 module.exports = router;

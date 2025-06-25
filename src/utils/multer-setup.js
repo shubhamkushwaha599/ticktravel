@@ -26,7 +26,9 @@ const configureMulter = ({ imagePath, videoPath }) => {
     const ext = path.extname(file.originalname).toLowerCase();
     const mimetype = file.mimetype;
 
-    if (file.fieldname === 'video') {
+    const isVideoField = ['video', 'videoUrl'].includes(file.fieldname);
+
+    if (isVideoField) {
       if (videoTypes.test(ext) && videoMimes.test(mimetype)) {
         return cb(null, true);
       }

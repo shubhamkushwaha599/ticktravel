@@ -233,30 +233,6 @@ router.put("/update/:id", multer.fields([
 });
 
 
-
-// ✅ Get all tour packages
-router.get("/all", async (req, res) => {
-  try {
-    const tours = await db.findAll(TourPackage, {}, null, { sort: { createdAt: -1 } });
-    res.json({ success: true, data: tours });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// ✅ Get one tour package by ID
-router.get("/get/:id", async (req, res) => {
-  try {
-    const tour = await db.findById(TourPackage, req.params.id);
-    if (!tour) return res.status(404).json({ success: false, message: "Tour not found" });
-    res.json({ success: true, data: tour });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-
-
 // ✅ Delete a tour package
 router.delete("/delete/:id", async (req, res) => {
   try {

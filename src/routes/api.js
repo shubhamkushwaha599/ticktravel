@@ -10,4 +10,7 @@ router.get("/ping", (req, res) => {
 router.use("/admin/tourpackage", require("../admin/tourpackage"));
 router.use("/admin/destination", require("../admin/destination"));
 
+router.use("/auth", require("../api/register"));
+router.use("/user", require("../api/user"));
+
 module.exports = router;

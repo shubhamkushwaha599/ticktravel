@@ -24,7 +24,7 @@ app.use('/api', require('./routes/api'));
 // fallback route for static files
 app.get("*", (req, res) => {
   // res.send("this is fall back route.")
-  res.sendFile(path.join(__dirname, "views", "destination.html"));
+  res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
 
