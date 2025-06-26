@@ -16,6 +16,7 @@ router.use("/user", require("../api/user"));
 
 // -----search api-----
 router.use("/search", require("../api/common"));
+router.use("tourpackage", require("../api/tourpackage"));
 
 
 module.exports = router;
