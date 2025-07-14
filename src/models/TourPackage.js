@@ -8,14 +8,6 @@ const tourPackageSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // slug: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    //   lowercase: true,
-    //   index: true, // 🔍 fast lookup by slug
-    // },
-
     destination: {
       type: String,
       required: true,
@@ -28,21 +20,14 @@ const tourPackageSchema = new mongoose.Schema(
 
     highlights: [String],
 
-    durationDays: {
-      type: Number,
-      required: true,
-      index: true, // 🔍 allow filtering by duration
-    },
-
-    capacity: {
-      type: Number,
-      default: 1,
-    },
-
     availableDates: [
       {
-        from: Date,
-        to: Date,
+        from: { type: Date, required: true },
+        to: { type: Date, required: true },
+        capacity: { type: Number, default: 1 },
+        bookedCount: { type: Number, default: 0 },
+        remainingCapacity: { type: Number, default: 1 }, // ✅ Added
+        duration: { type: Number }, // ✅ Added (optional override of durationDays)
       },
     ],
 
@@ -55,7 +40,6 @@ const tourPackageSchema = new mongoose.Schema(
     includes: [String],
     excludes: [String],
 
-    // 🖼️ Media
     titleImage: {
       type: String,
     },
@@ -69,12 +53,6 @@ const tourPackageSchema = new mongoose.Schema(
       type: String,
     },
 
-    // isFeatured: {
-    //   type: Boolean,
-    //   default: false,
-    //   index: true, // 🔍 query featured tours
-    // },
-
     faqs: [
       {
         question: String,
@@ -86,7 +64,12 @@ const tourPackageSchema = new mongoose.Schema(
       type: String,
       enum: ['active', 'inactive'],
       default: 'active',
-      index: true, // 🔍 fast filter for active tours
+      index: true,
+    },
+
+    rating: {
+      average: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
     },
   },
   {
@@ -94,10 +77,8 @@ const tourPackageSchema = new mongoose.Schema(
   }
 );
 
-// 🧠 Compound Index (optional, for sorted homepage sections)
+// Indexes
 tourPackageSchema.index({ createdAt: -1 });
-
-// 🧠 Text Index (for full-text search)
 tourPackageSchema.index({ title: 'text', description: 'text' });
 
 module.exports = mongoose.model('TourPackage', tourPackageSchema);

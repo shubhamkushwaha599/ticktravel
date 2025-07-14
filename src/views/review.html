@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submit Tour Review</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    textarea, select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #responseMessage {
+      text-align: center;
+      font-weight: bold;
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <h2>Submit Your Review</h2>
+
+  <form id="reviewForm">
+    <!-- Hidden user ID and tour package ID -->
+    <input type="hidden" id="user" value="64f123456789abcdef123456" />
+    <input type="hidden" id="tourPackage" value="65a123456789abcdef123456" />
+
+    <label for="rating">Rating</label>
+    <select id="rating" required>
+      <option value="">Select Rating</option>
+      <option value="1">⭐ 1 - Poor</option>
+      <option value="2">⭐ 2 - Fair</option>
+      <option value="3">⭐ 3 - Good</option>
+      <option value="4">⭐ 4 - Very Good</option>
+      <option value="5">⭐ 5 - Excellent</option>
+    </select>
+
+    <label for="comment">Comment</label>
+    <textarea id="comment" rows="4" placeholder="Write your experience..." required></textarea>
+
+    <button type="submit">Submit Review</button>
+  </form>
+
+  <p id="responseMessage"></p>
+
+  <script>
+    const form = document.getElementById("reviewForm");
+    const message = document.getElementById("responseMessage");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const user = document.getElementById("user").value;
+      const tourPackage = document.getElementById("tourPackage").value;
+      const rating = document.getElementById("rating").value;
+      const comment = document.getElementById("comment").value;
+
+      try {
+        const res = await fetch("/reviews/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user, tourPackage, rating, comment }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          message.textContent = "✅ Review submitted successfully!";
+          message.style.color = "green";
+          form.reset();
+        } else {
+          message.textContent = "❌ " + data.error;
+        }
+      } catch (err) {
+        message.textContent = "❌ Failed to submit review.";
+      }
+    });
+  </script>
+</body>
+</html>

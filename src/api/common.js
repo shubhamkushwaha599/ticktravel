@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-// -------models and utils imports-------
+//--------models and utils imports-------
 const TourPackage = require("../models/TourPackage");
 const Destination = require("../models/Destination");
 
-// -------db queries import-------
+//------------db queries import------------
 const db = require("../dbqueries/dbqueries"); // adjust path if needed
-
+// -------------------------------------------------------------------------
 
 router.get("/:searchStr", async (req, res) => {
   try {
@@ -46,7 +46,6 @@ router.get("/:searchStr", async (req, res) => {
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
-
 
 
 

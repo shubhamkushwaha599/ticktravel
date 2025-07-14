@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tour Booking Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+    }
+
+    label {
+      display: inline-block;
+      width: 120px;
+      vertical-align: top;
+    }
+
+    input, select, textarea {
+      width: calc(100% - 130px);
+      padding: 6px;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+
+    #response {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      padding: 10px;
+      border-left: 4px solid #999;
+    }
+
+    .loading {
+      background-color: #fff3cd;
+      border-color: #ffeeba;
+    }
+
+    .success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧳 Tour Booking Form</h2>
+
+  <form id="bookingForm">
+    <label for="tourPackage">Tour Package ID:</label>
+    <input type="text" id="tourPackage" name="tourPackage" required><br>
+
+    <label for="from">From Date:</label>
+    <input type="date" id="from" name="selectedDate[from]" required><br>
+
+    <label for="to">To Date:</label>
+    <input type="date" id="to" name="selectedDate[to]" required><br>
+
+    <h3>👨‍👩‍👧 Guests</h3>
+    <label>Adults:</label>
+    <input type="number" name="guests[adults]" min="0" required><br>
+    <label>Children:</label>
+    <input type="number" name="guests[children]" min="0"><br>
+    <label>Infants:</label>
+    <input type="number" name="guests[infants]" min="0"><br>
+
+    <h3>📞 Contact Information</h3>
+    <label>Full Name:</label>
+    <input type="text" name="contactInfo[fullName]" required><br>
+    <label>Email:</label>
+    <input type="email" name="contactInfo[email]" required><br>
+    <label>Phone:</label>
+    <input type="tel" name="contactInfo[phone]" required><br>
+
+    <h3>📝 Additional Notes</h3>
+    <label>Notes:</label>
+    <textarea name="notes" rows="4" placeholder="Any special requests or comments..."></textarea><br>
+
+    <button type="submit">✅ Book Now</button>
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = {
+        tourPackage: formData.get("tourPackage"),
+        selectedDate: {
+          from: formData.get("selectedDate[from]"),
+          to: formData.get("selectedDate[to]"),
+        },
+        guests: {
+          adults: parseInt(formData.get("guests[adults]")),
+          children: parseInt(formData.get("guests[children]") || 0),
+          infants: parseInt(formData.get("guests[infants]") || 0),
+        },
+        contactInfo: {
+          fullName: formData.get("contactInfo[fullName]"),
+          email: formData.get("contactInfo[email]"),
+          phone: formData.get("contactInfo[phone]"),
+        },
+        notes: formData.get("notes") || ""
+      };
+
+      const fromDate = new Date(data.selectedDate.from);
+      const toDate = new Date(data.selectedDate.to);
+      if (fromDate > toDate) {
+        alert("❌ From date cannot be later than To date.");
+        return;
+      }
+
+      const totalGuests = data.guests.adults + data.guests.children + data.guests.infants;
+      if (totalGuests <= 0) {
+        alert("❌ At least one guest must be selected.");
+        return;
+      }
+
+      const responseBox = document.getElementById("response");
+      responseBox.className = "loading";
+      responseBox.innerText = "⏳ Submitting your booking...";
+
+      const token = prompt("Enter your Bearer token:");
+      if (!token) {
+        alert("❌ Authorization token is required.");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:80/api/user/booking/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Booking failed");
+
+        responseBox.className = "success";
+        responseBox.innerText = "✅ Booking successful:\n" + JSON.stringify(result, null, 2);
+        form.reset();
+      } catch (err) {
+        responseBox.className = "error";
+        responseBox.innerText = `❌ Error submitting booking:\n${err.message}`;
+      }
+    });
+  </script>
+
+</body>
+</html>

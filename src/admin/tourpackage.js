@@ -10,6 +10,7 @@ const { TOUR_IMAGES_PATH, TOUR_VIDEO_PATH } = require("../config/consts");
 
 // -------------models imports-------------------
 const TourPackage = require("../models/TourPackage");
+// -------------end of imports-------------------
 
 // Ensure directories exist
 const imagePath = path.join(__dirname, TOUR_IMAGES_PATH);
@@ -36,21 +37,22 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const authorId = req.body.authorId || "guest@example.com";
+      const user = req.body.user || "guest@example.com";
 
       const {
         title,
         description,
         destination,
-        durationDays,
-        capacity,
+        // durationDays,
         status,
         highlights,
         includes,
         excludes,
       } = req.body;
 
-      // ✅ Handle price from flat or nested format
+      console.log("Request body:", req.body);
+
+      // ✅ Parse price
       let price = req.body.price;
       if (typeof price === "object" && price !== null) {
         price = {
@@ -66,23 +68,42 @@ router.post(
         };
       }
 
-      // ✅ Handle availableDates from flat or nested format
+      // ✅ Handle availableDates with capacity, duration, bookedCount, remainingCapacity
       let availableDates = [];
+
       if (Array.isArray(req.body.availableDates)) {
-        availableDates = req.body.availableDates.map((d) => ({
-          from: new Date(d.from),
-          to: new Date(d.to),
+        // 🟢 Handle array of objects
+        availableDates = req.body.availableDates.map((date) => ({
+          from: new Date(date.from),
+          to: new Date(date.to),
+          capacity: Number(date.capacity) || 1,
+          bookedCount: 0,
+          remainingCapacity: Number(date.capacity) || 1,
+          duration:
+            date.duration ??
+            Math.ceil((new Date(date.to) - new Date(date.from)) / (1000 * 60 * 60 * 24)),
         }));
       } else {
+        // 🟡 Handle legacy flat form-data format
         for (let i = 0; req.body[`availableDates[${i}][from]`]; i++) {
           availableDates.push({
             from: new Date(req.body[`availableDates[${i}][from]`]),
             to: new Date(req.body[`availableDates[${i}][to]`]),
+            capacity: Number(req.body[`availableDates[${i}][capacity]`]) || 1,
+            bookedCount: 0,
+            remainingCapacity: Number(req.body[`availableDates[${i}][capacity]`]) || 1,
+            duration: Math.ceil(
+              (new Date(req.body[`availableDates[${i}][to]`]) -
+                new Date(req.body[`availableDates[${i}][from]`])) /
+                (1000 * 60 * 60 * 24)
+            ),
           });
         }
       }
 
-      // ✅ Process file uploads
+
+
+      // ✅ File uploads
       const timestamp = Date.now();
       let titleImage = null;
       const tourImages = [];
@@ -113,9 +134,9 @@ router.post(
         videoFile = path.join(TOUR_VIDEO_PATH, newFileName);
       }
 
-      // ✅ Create the new tour package document
+      // ✅ Create tour package
       const newPackage = await db.create(TourPackage, {
-        authorId,
+        user,
         title,
         description,
         destination,
@@ -128,8 +149,7 @@ router.post(
         excludes: Array.isArray(excludes)
           ? excludes.filter(Boolean)
           : [excludes].filter(Boolean),
-        durationDays: Number(durationDays),
-        capacity: Number(capacity) || 1,
+        // durationDays: Number(durationDays),
         availableDates,
         price,
         titleImage,
@@ -143,7 +163,6 @@ router.post(
         data: newPackage,
       });
     } catch (error) {
-      // Clean up uploaded files on error
       Object.values(req.files || {}).flat().forEach((file) => {
         if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
       });
@@ -153,6 +172,9 @@ router.post(
     }
   }
 );
+
+
+
 
 
 // update tour package

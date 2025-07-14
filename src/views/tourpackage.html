@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Tour Package</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .inline {
+      display: flex;
+      gap: 10px;
+    }
+
+    .inline > div {
+      flex: 1;
+    }
+
+    .dynamic-group {
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Create Tour Package</h2>
+
+  <form action="/api/admin/tourpackage/submit" method="POST" enctype="multipart/form-data">
+    <label>Title:</label>
+    <input type="text" name="title" required>
+
+    <label>Destination:</label>
+    <input type="text" name="destination" required>
+
+    <label>Description:</label>
+    <textarea name="description" rows="4" required></textarea>
+
+    <label>Highlights:</label>
+    <div id="highlights" class="dynamic-group">
+      <input type="text" name="highlights[]" placeholder="Highlight 1">
+    </div>
+    <button type="button" onclick="addField('highlights', 'highlights[]')">+ Add Highlight</button>
+
+    <!-- <label>Duration Days:</label>
+    <input type="number" name="durationDays" required> -->
+
+    <label>Available Dates:</label>
+    <div id="availableDates" class="dynamic-group">
+      <div class="inline">
+        <div><input type="date" name="availableDates[0][from]" placeholder="From date"></div>
+        <div><input type="date" name="availableDates[0][to]" placeholder="To date"></div>
+        <div><input type="number" name="availableDates[0][capacity]" placeholder="Capacity" value="1" min="1"></div>
+        <div><input type="number" name="availableDates[0][duration]" placeholder="Duration (optional)" min="1"></div>
+      </div>
+    </div>
+    <button type="button" onclick="addDateField()">+ Add Date Range</button>
+
+    <label>Price (INR):</label>
+    <div class="inline">
+      <div><input type="number" name="price[adult]" placeholder="Adult" required></div>
+      <div><input type="number" name="price[child]" placeholder="Child"></div>
+      <div><input type="number" name="price[infant]" placeholder="Infant"></div>
+    </div>
+
+    <label>Includes:</label>
+    <div id="includes" class="dynamic-group">
+      <input type="text" name="includes[]" placeholder="Include 1">
+    </div>
+    <button type="button" onclick="addField('includes', 'includes[]')">+ Add Include</button>
+
+    <label>Excludes:</label>
+    <div id="excludes" class="dynamic-group">
+      <input type="text" name="excludes[]" placeholder="Exclude 1">
+    </div>
+    <button type="button" onclick="addField('excludes', 'excludes[]')">+ Add Exclude</button>
+
+    <label>FAQs:</label>
+    <div id="faqs" class="dynamic-group">
+      <div class="inline">
+        <div><input type="text" name="faqs[0][question]" placeholder="Question"></div>
+        <div><input type="text" name="faqs[0][answer]" placeholder="Answer"></div>
+      </div>
+    </div>
+    <button type="button" onclick="addFaqField()">+ Add FAQ</button>
+
+    <label>Title Image:</label>
+    <input type="file" name="titleImage" accept="image/*" required>
+
+    <label>Tour Images (Max 10):</label>
+    <input type="file" name="tourImages" accept="image/*" multiple>
+
+    <label>Video File:</label>
+    <input type="file" name="videoUrl" accept="video/*">
+
+    <label>Status:</label>
+    <select name="status">
+      <option value="active" selected>Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+
+    <button type="submit">Submit Tour Package</button>
+  </form>
+
+  <script>
+    function addField(containerId, inputName) {
+      const container = document.getElementById(containerId);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = inputName;
+      container.appendChild(input);
+    }
+
+    function addDateField() {
+      const container = document.getElementById("availableDates");
+      const index = container.querySelectorAll(".inline").length;
+      const div = document.createElement("div");
+      div.className = "inline";
+
+      const fromWrap = document.createElement("div");
+      const from = document.createElement("input");
+      from.type = "date";
+      from.name = `availableDates[${index}][from]`;
+      fromWrap.appendChild(from);
+
+      const toWrap = document.createElement("div");
+      const to = document.createElement("input");
+      to.type = "date";
+      to.name = `availableDates[${index}][to]`;
+      toWrap.appendChild(to);
+
+      const capWrap = document.createElement("div");
+      const cap = document.createElement("input");
+      cap.type = "number";
+      cap.name = `availableDates[${index}][capacity]`;
+      cap.placeholder = "Capacity";
+      cap.value = "1";
+      cap.min = "1";
+      capWrap.appendChild(cap);
+
+      const durWrap = document.createElement("div");
+      const dur = document.createElement("input");
+      dur.type = "number";
+      dur.name = `availableDates[${index}][duration]`;
+      dur.placeholder = "Duration (optional)";
+      dur.min = "1";
+      durWrap.appendChild(dur);
+
+      div.appendChild(fromWrap);
+      div.appendChild(toWrap);
+      div.appendChild(capWrap);
+      div.appendChild(durWrap);
+      container.appendChild(div);
+    }
+
+    function addFaqField() {
+      const container = document.getElementById("faqs");
+      const index = container.querySelectorAll(".inline").length;
+      const div = document.createElement("div");
+      div.className = "inline";
+
+      const qDiv = document.createElement("div");
+      const q = document.createElement("input");
+      q.name = `faqs[${index}][question]`;
+      q.placeholder = "Question";
+      qDiv.appendChild(q);
+
+      const aDiv = document.createElement("div");
+      const a = document.createElement("input");
+      a.name = `faqs[${index}][answer]`;
+      a.placeholder = "Answer";
+      aDiv.appendChild(a);
+
+      div.appendChild(qDiv);
+      div.appendChild(aDiv);
+      container.appendChild(div);
+    }
+  </script>
+
+</body>
+</html>

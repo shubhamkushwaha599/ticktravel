@@ -18,13 +18,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
+// ✅ Import cron job AFTER DB connection is ready
+require('./utils/availability-cron');
+
 // dymanic web root
 app.use('/api', require('./routes/api'));
+
+
+// -------for dummy payment checks------------------
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'views', 'index.html'));
+// });
+// --------------------must be removed---------------
 
 // fallback route for static files
 app.get("*", (req, res) => {
   // res.send("this is fall back route.")
-  res.sendFile(path.join(__dirname, "views", "index.html"));
+  res.sendFile(path.join(__dirname, "views", "booking.html"));
+  // res.render("index");
+  // res.render('razorpay', { title: "Welcome to Razorpay" }); // Pass variables if needed
 });
 
 
