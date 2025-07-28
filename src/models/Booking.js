@@ -35,6 +35,11 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    
+    payment_id: { 
+    type: String, 
+    default: null               // ✅ Safe default
+    },
 
     paymentStatus: {
       type: String,

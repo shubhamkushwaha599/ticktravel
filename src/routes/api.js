@@ -10,6 +10,10 @@ router.get("/ping", (req, res) => {
 router.use("/admin/tourpackage", require("../admin/tourpackage"));
 router.use("/admin/destination", isValidAdminLogin, require("../admin/destination"));
 
+// -------------admin booking routes-------------
+router.use("/admin/booking", require("../admin/booking"));
+// -------------------------------------------------------------------
+
 // ------user login and registration------
 router.use("/auth", require("../api/register"));
 router.use("/user", require("../api/user"));

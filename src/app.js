@@ -11,7 +11,7 @@ const app = express();
 
 // load middleware
 app.use(cors());
-app.use(cookieParser());
+app.use(cookieParser());    
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -34,7 +34,10 @@ app.use('/api', require('./routes/api'));
 // fallback route for static files
 app.get("*", (req, res) => {
   // res.send("this is fall back route.")
+  // res.sendFile(path.join(__dirname, "views", "tourpackage.html"));
+  // res.sendFile(path.join(__dirname, "views", "index.html"));
   res.sendFile(path.join(__dirname, "views", "booking.html"));
+
   // res.render("index");
   // res.render('razorpay', { title: "Welcome to Razorpay" }); // Pass variables if needed
 });
